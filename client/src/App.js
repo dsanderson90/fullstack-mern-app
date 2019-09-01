@@ -14,6 +14,13 @@ class App extends Component {
   };
 
   componentDidMount() {
+    if(!this.state.intervalSet) {
+      let interval = setInterval(this.getDataFromDB, 1000);
+      this.setState({ intervalSet: interval })
+    }
+  }
+
+  componentWillUnmount() {
     if(this.state.intervalSet) {
       clearInterval(this.state.intervalSet);
       this.setState({ intervalSet: null});
@@ -30,7 +37,7 @@ class App extends Component {
     let currentIds = this.state.data.map((data) => data.id);
     let idToBeAdded = 0;
     while(currentIds.includes(idToBeAdded)) {
-      ++idToBeAdded;
+      idToBeAdded++;
     }
 
     axios.post('http://localhost:3001/api/putData', {
@@ -77,7 +84,7 @@ class App extends Component {
           {data.length <= 0
           ? 'No DB ENTRIES YET'
           : data.map((dat) => (
-            <li style = {{ padding: '10px'}} key={data.msg}>
+            <li style = {{ padding: '10px'}} key={dat.msg}>
               <span style = {{ color: 'gray' }}>id: </span> {dat.id} <br />
               <span style = {{ color: 'gray'  }}>data: </span> {dat.msg}
             </li>
@@ -109,10 +116,17 @@ class App extends Component {
         <div style={{  padding: '10px' }}>
           <input
             type="text"
-            onChange={(e) => this.setState({idToDelete: e.target.value })}
-            placeholder="put id of item to delete here"
+            onChange={(e) => this.setState({idToUpdate: e.target.value })}
+            placeholder="put id of item to update here"
             style={{  width: '200px'  }}
             />
+          <input
+            type="text"
+            onChange={(e) => this.setState({updateToApply: e.target.value })}
+            placeholder="put new value of the item here"
+            style={{  width: '200px'  }}
+            />
+
           <button
           onClick={() =>
             this.updateDB(this.state.idToUpdate, this.state.updateToApply)
